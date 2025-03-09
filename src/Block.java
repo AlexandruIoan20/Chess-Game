@@ -9,6 +9,7 @@ public class Block {
     int number;
     int x, y, size;
     boolean isOcupied;
+    boolean isSelected;
 
     Block(char letter, int number, int x, int y, int size) {
         this.letter = letter;
@@ -26,5 +27,7 @@ public class Block {
         int indexOfLetter = availableLetters.indexOf(letter) + 1;
         if(indexOfLetter % 2 == this.number % 2) this.color = 'D';
         else this.color = 'W';
+
+
     }
 }

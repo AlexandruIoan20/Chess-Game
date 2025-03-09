@@ -2,12 +2,14 @@ package src;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.HashSet;
 
 import src.constants.PieceNames;
 import src.constants.PieceNumbers;
 
-public class GameTable extends JPanel {
+public class GameTable extends JPanel implements MouseListener {
     private int tileSize = 80;
     private int squaresOnRow = 8;
     private int boardWidth = tileSize * squaresOnRow;
@@ -48,8 +50,11 @@ public class GameTable extends JPanel {
 
     private char[] letters = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
     HashSet<Block> gameSquares;
+    Block selectedBlock;
 
     GameTable() {
+        addMouseListener(this);
+        selectedBlock = null;
         // Init HashSets
         darkPawns = new HashSet<>();
         whitePawns = new HashSet<>();
@@ -119,9 +124,35 @@ public class GameTable extends JPanel {
 
         for(int i = 0; i < 8; i++)
             for(int j = 0; j < 8; j++) {
-                Block block = new Block(letters[j], 8 - i + 1, i * tileSize, j * tileSize, tileSize);
+                Block block = new Block(letters[j], 8 - i, j * tileSize, i * tileSize, tileSize);
+
+                if(8 - i == 8 || 8 - i == 7 || 8 - i == 2 || 8  - i == 1) block.isOcupied = true;
+                else block.isOcupied = false;
+
                 gameSquares.add(block);
             }
+    }
+
+    void selectBlock(int x, int y) {
+        Block newSelectedBlock = null;
+        int minDifX = Integer.MAX_VALUE;
+        int minDifY = Integer.MAX_VALUE;
+
+        for(Block block : gameSquares) {
+            if((x - block.x >= 0 && y - block.y >= 0) && (x - block.x < minDifX || y - block.y < minDifY)) {
+                newSelectedBlock = block;
+                minDifX = x - block.x;
+                minDifY = y - block.y;
+            }
+        }
+
+        if(newSelectedBlock != null && newSelectedBlock.isOcupied) {
+            if(this.selectedBlock != null) this.selectedBlock.isSelected = false;
+            this.selectedBlock = newSelectedBlock;
+            this.selectedBlock.isSelected = true;
+        }
+
+        repaint();
     }
 
     @Override
@@ -132,8 +163,8 @@ public class GameTable extends JPanel {
 
     public void draw(Graphics g) {
         // Draw Squares
-        for(Block block : gameSquares)
-            if(block.color == 'D') {
+        for(Block block : gameSquares) {
+            if (block.color == 'D') {
                 g.setColor(new Color(4, 0, 112));
                 g.fillRect(block.x, block.y, block.size, block.size);
             } else {
@@ -141,6 +172,14 @@ public class GameTable extends JPanel {
                 g.fillRect(block.x, block.y, block.size, block.size);
             }
 
+            if(block.isSelected) {
+                Graphics2D g2d = (Graphics2D) g;
+
+                g2d.setColor(Color.BLACK);
+                g2d.setStroke(new BasicStroke(8));
+                g2d.drawRect(block.x, block.y, block.size, block.size);
+            }
+        }
         // Draw Pieces
         g.drawImage(whiteKing.image, whiteKing.x, whiteKing.y, whiteKing.width, whiteKing.height, null);
         g.drawImage(darkKing.image, darkKing.x, darkKing.y, darkKing.width, darkKing.height, null);
@@ -161,4 +200,28 @@ public class GameTable extends JPanel {
         for(Piece pawn : darkPawns) g.drawImage(pawn.image, pawn.x, pawn.y, pawn.width, pawn.height, null);
     }
 
+    @Override
+    public void mouseClicked(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        selectBlock(e.getX(), e.getY());
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
 }

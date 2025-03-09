@@ -1,6 +1,7 @@
 package src;
 
 import java.awt.*;
+import src.constants.PieceNames;
 
 public class Piece {
     private char color; // D - dark / W - white
@@ -23,5 +24,9 @@ public class Piece {
         this.height = tileSize;
         this.startX = x;
         this.startY = y;
+    }
+
+    public void move() {
+
     }
 }
