@@ -47,6 +47,16 @@ public class GameTable extends JPanel {
     Piece whiteQueen, darkQueen;
 
     GameTable() {
+        // Init HashSets
+        darkPawns = new HashSet<>();
+        whitePawns = new HashSet<>();
+        darkKnights = new HashSet<>();
+        whiteKnights = new HashSet<>();
+        darkBishops = new HashSet<>();
+        whiteBishops = new HashSet<>();
+        darkRooks = new HashSet<>();
+        whiteRooks = new HashSet<>();
+
         darkQueenImage = new ImageIcon(getClass().getResource("./resources/black-queen.png")).getImage();
         whiteQueenImage = new ImageIcon(getClass().getResource("./resources/white-queen.png")).getImage();
 
@@ -83,7 +93,7 @@ public class GameTable extends JPanel {
         whiteBishops.add(new Piece(PieceNames.BISHOP.getPieceName(), whiteBishopImage, 'W', 2 * tileSize, 7 * tileSize, tileSize));
         whiteBishops.add(new Piece(PieceNames.BISHOP.getPieceName(), whiteBishopImage, 'W', 5 * tileSize, 7 * tileSize, tileSize));
         darkBishops.add(new Piece(PieceNames.BISHOP.getPieceName(), darkBishopImage, 'D', 2 * tileSize, 0, tileSize));
-        darkBishops.add(new Piece(PieceNames.BISHOP.getPieceName(), darkBishopImage, 'D', 2 * tileSize, 0, tileSize));
+        darkBishops.add(new Piece(PieceNames.BISHOP.getPieceName(), darkBishopImage, 'D', 5 * tileSize, 0, tileSize));
 
         // Init Knights
         whiteKnights.add(new Piece(PieceNames.KNIGHT.getPieceName(), whiteKnightImage, 'W', tileSize, 7 * tileSize, tileSize));
@@ -92,10 +102,15 @@ public class GameTable extends JPanel {
         darkKnights.add(new Piece(PieceNames.KNIGHT.getPieceName(), darkKnightImage, 'D', 6 * tileSize, 0, tileSize));
 
         // Init Rooks
-        whiteRooks.add(new Piece(PieceNames.ROOK.getPieceName(), whiteRookImage, 'W', 0, 0, tileSize));
-        whiteRooks.add(new Piece(PieceNames.ROOK.getPieceName(), whiteRookImage, 'W', 7 * tileSize, 0, tileSize));
-        darkRooks.add(new Piece(PieceNames.ROOK.getPieceName(), darkRookImage, 'D', 0, 7 * tileSize, tileSize));
-        darkRooks.add(new Piece(PieceNames.ROOK.getPieceName(),darkRookImage, 'D', 7 * tileSize, 7 * tileSize, tileSize));
+        whiteRooks.add(new Piece(PieceNames.ROOK.getPieceName(), whiteRookImage, 'W', 0, 7 * tileSize, tileSize));
+        whiteRooks.add(new Piece(PieceNames.ROOK.getPieceName(),whiteRookImage, 'W', 7 * tileSize, 7 * tileSize, tileSize));
+        darkRooks.add(new Piece(PieceNames.ROOK.getPieceName(), darkRookImage, 'D', 0, 0, tileSize));
+        darkRooks.add(new Piece(PieceNames.ROOK.getPieceName(), darkRookImage, 'D', 7 * tileSize, 0, tileSize));
+
+        for(int i = 0; i < PieceNumbers.PAWN_NUMBERS.getPieceNumbers(); i++) {
+            whitePawns.add(new Piece(PieceNames.PAWN.getPieceName(), whitePawnImage, 'W', i * tileSize, 6 * tileSize, tileSize));
+            darkPawns.add(new Piece(PieceNames.PAWN.getPieceName(), darkRookImage, 'D', i * tileSize, tileSize, tileSize));
+        }
     }
 
     @Override
@@ -106,6 +121,22 @@ public class GameTable extends JPanel {
 
     public void draw(Graphics g) {
         g.drawImage(whiteKing.image, whiteKing.x, whiteKing.y, whiteKing.width, whiteKing.height, null);
+        g.drawImage(darkKing.image, darkKing.x, darkKing.y, darkKing.width, darkKing.height, null);
+
+        g.drawImage(whiteQueen.image, whiteQueen.x, whiteQueen.y, whiteQueen.width, whiteQueen.height, null);
+        g.drawImage(darkQueen.image, darkQueen.x, darkQueen.y, darkQueen.width, darkQueen.height, null);
+
+        for(Piece bishop : whiteBishops) g.drawImage(bishop.image, bishop.x, bishop.y, bishop.width, bishop.height, null);
+        for(Piece bishop : darkBishops) g.drawImage(bishop.image, bishop.x, bishop.y, bishop.width, bishop.height, null);
+
+        for(Piece knight : whiteKnights) g.drawImage(knight.image, knight.x, knight.y, knight.width, knight.height, null);
+        for(Piece knight : darkKnights) g.drawImage(knight.image, knight.x, knight.y, knight.width, knight.height, null);
+
+        for(Piece rook : whiteRooks) g.drawImage(rook.image, rook.x, rook.y, rook.width, rook.height, null);
+        for(Piece rook : darkRooks) g.drawImage(rook.image, rook.x, rook.y, rook.width, rook.height, null);
+
+        for(Piece pawn : whitePawns) g.drawImage(pawn.image, pawn.x, pawn.y, pawn.width, pawn.height, null);
+        for(Piece pawn : darkPawns) g.drawImage(pawn.image, pawn.x, pawn.y, pawn.width, pawn.height, null);
     }
 
 }
