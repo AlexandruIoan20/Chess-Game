@@ -46,6 +46,9 @@ public class GameTable extends JPanel {
     Piece whiteKing, darkKing;
     Piece whiteQueen, darkQueen;
 
+    private char[] letters = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
+    HashSet<Block> gameSquares;
+
     GameTable() {
         // Init HashSets
         darkPawns = new HashSet<>();
@@ -56,6 +59,8 @@ public class GameTable extends JPanel {
         whiteBishops = new HashSet<>();
         darkRooks = new HashSet<>();
         whiteRooks = new HashSet<>();
+
+        gameSquares = new HashSet<>();
 
         darkQueenImage = new ImageIcon(getClass().getResource("./resources/black-queen.png")).getImage();
         whiteQueenImage = new ImageIcon(getClass().getResource("./resources/white-queen.png")).getImage();
@@ -111,6 +116,12 @@ public class GameTable extends JPanel {
             whitePawns.add(new Piece(PieceNames.PAWN.getPieceName(), whitePawnImage, 'W', i * tileSize, 6 * tileSize, tileSize));
             darkPawns.add(new Piece(PieceNames.PAWN.getPieceName(), darkRookImage, 'D', i * tileSize, tileSize, tileSize));
         }
+
+        for(int i = 0; i < 8; i++)
+            for(int j = 0; j < 8; j++) {
+                Block block = new Block(letters[j], 8 - i + 1, i * tileSize, j * tileSize, tileSize);
+                gameSquares.add(block);
+            }
     }
 
     @Override
@@ -120,6 +131,17 @@ public class GameTable extends JPanel {
     }
 
     public void draw(Graphics g) {
+        // Draw Squares
+        for(Block block : gameSquares)
+            if(block.color == 'D') {
+                g.setColor(new Color(4, 0, 112));
+                g.fillRect(block.x, block.y, block.size, block.size);
+            } else {
+                g.setColor(new Color(146, 205, 255));
+                g.fillRect(block.x, block.y, block.size, block.size);
+            }
+
+        // Draw Pieces
         g.drawImage(whiteKing.image, whiteKing.x, whiteKing.y, whiteKing.width, whiteKing.height, null);
         g.drawImage(darkKing.image, darkKing.x, darkKing.y, darkKing.width, darkKing.height, null);
 
