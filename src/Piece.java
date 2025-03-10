@@ -5,7 +5,7 @@ import src.constants.PieceNames;
 
 public class Piece {
     private char color; // D - dark / W - white
-    private int name;
+    int name;
     private int tileSize;
     Image image;
 
@@ -26,7 +26,14 @@ public class Piece {
         this.startY = y;
     }
 
-    public void move() {
+    public Block[] checkMove(Block existingBlock) {
+        // scrie functia de verificare miscare pentru fiecare piesa
+            // primeste blockul unde se afla si trebuie sa returneze toate blocurile unde poate ajunge (sau ceva de genu)
 
+        return new Block [] { new Block('a', 1, 2, 3, 4) };
+    }
+
+    public void move(Block existingBlock) {
+        // scrie functia de miscare propriu-zisa(cand apesi pe un camp gol, aceasta functie este apelata iar piesa se misca)
     }
 }

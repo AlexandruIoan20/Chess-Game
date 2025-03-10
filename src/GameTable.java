@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Arrays;
 import java.util.HashSet;
 
 import src.constants.PieceNames;
@@ -14,6 +15,7 @@ public class GameTable extends JPanel implements MouseListener {
     private int squaresOnRow = 8;
     private int boardWidth = tileSize * squaresOnRow;
     private int boardHeight = tileSize * squaresOnRow;
+    private boolean pieceSelected = false;
 
     Image darkQueenImage;
     Image whiteQueenImage;
@@ -48,6 +50,9 @@ public class GameTable extends JPanel implements MouseListener {
     Piece whiteKing, darkKing;
     Piece whiteQueen, darkQueen;
 
+    HashSet<HashSet<Piece>> whitePieces;
+    HashSet<HashSet<Piece>> darkPieces;
+
     private char[] letters = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
     HashSet<Block> gameSquares;
     Block selectedBlock;
@@ -66,6 +71,21 @@ public class GameTable extends JPanel implements MouseListener {
         whiteRooks = new HashSet<>();
 
         gameSquares = new HashSet<>();
+        whitePieces = new HashSet<>();
+        darkPieces = new HashSet<>();
+
+        // Build pieces hash sets
+        whitePieces.add(whiteRooks);
+        whitePieces.add(whiteBishops);
+        whitePieces.add(whiteKnights);
+        whitePieces.add(whitePawns);
+        whitePieces.add(new HashSet<Piece>(Arrays.asList(whiteQueen, whiteKing)));
+
+        darkPieces.add(darkRooks);
+        darkPieces.add(darkBishops);
+        darkPieces.add(darkKnights);
+        darkPieces.add(darkPawns);
+        darkPieces.add(new HashSet<Piece>(Arrays.asList(darkQueen, darkQueen)));
 
         darkQueenImage = new ImageIcon(getClass().getResource("./resources/black-queen.png")).getImage();
         whiteQueenImage = new ImageIcon(getClass().getResource("./resources/white-queen.png")).getImage();
@@ -134,6 +154,31 @@ public class GameTable extends JPanel implements MouseListener {
     }
 
     void selectBlock(int x, int y) {
+        this.pieceSelected = true;
+        Block newSelectedBlock = findBlockByCoordinates(x, y);
+
+        if(newSelectedBlock != null && newSelectedBlock.isOcupied) {
+            if(this.selectedBlock != null) this.selectedBlock.isSelected = false;
+            this.selectedBlock = newSelectedBlock;
+            this.selectedBlock.isSelected = true;
+        }
+
+        repaint();
+    }
+
+    void movePiece(int x, int y) {
+        pieceSelected = false;
+
+        Piece selectedPiece = findPieceByCoordinates(x, y);
+        Block blockToMove = findBlockByCoordinates(x, y);
+
+        System.out.println(selectedPiece.name);
+        System.out.println(blockToMove.letter + " " + blockToMove.number);
+
+        System.out.println("Done");
+    }
+
+    Block findBlockByCoordinates(int x, int y) {
         Block newSelectedBlock = null;
         int minDifX = Integer.MAX_VALUE;
         int minDifY = Integer.MAX_VALUE;
@@ -146,14 +191,49 @@ public class GameTable extends JPanel implements MouseListener {
             }
         }
 
-        if(newSelectedBlock != null && newSelectedBlock.isOcupied) {
-            if(this.selectedBlock != null) this.selectedBlock.isSelected = false;
-            this.selectedBlock = newSelectedBlock;
-            this.selectedBlock.isSelected = true;
+        return newSelectedBlock;
+    }
+
+    Piece findPieceByCoordinates(int x, int y) {
+        int minDifX = Integer.MAX_VALUE;
+        int minDifY = Integer.MAX_VALUE;
+
+        Piece result = null;
+
+        // Check for null whitePieces and darkPieces before iterating
+        if (whitePieces != null) {
+            for (HashSet<Piece> pieceSet : whitePieces) {
+                if (pieceSet != null) {
+                    for (Piece piece : pieceSet) {
+                        if (piece != null && (x - piece.x >= 0 && y - piece.y >= 0) &&
+                                (x - piece.x < minDifX || y - piece.y < minDifY)) {
+                            result = piece;
+                            minDifX = x - piece.x;
+                            minDifY = y - piece.y;
+                        }
+                    }
+                }
+            }
         }
 
-        repaint();
+        if (darkPieces != null) {
+            for (HashSet<Piece> pieceSet : darkPieces) {
+                if (pieceSet != null) {
+                    for (Piece piece : pieceSet) {
+                        if (piece != null && (x - piece.x >= 0 && y - piece.y >= 0) &&
+                                (x - piece.x < minDifX || y - piece.y < minDifY)) {
+                            result = piece;
+                            minDifX = x - piece.x;
+                            minDifY = y - piece.y;
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
     }
+
 
     @Override
     public void paintComponent(Graphics g) {
@@ -212,7 +292,8 @@ public class GameTable extends JPanel implements MouseListener {
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        selectBlock(e.getX(), e.getY());
+        if(!this.pieceSelected) selectBlock(e.getX(), e.getY());
+        else movePiece(e.getX(), e.getY());
     }
 
     @Override

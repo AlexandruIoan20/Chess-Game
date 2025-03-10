@@ -27,7 +27,5 @@ public class Block {
         int indexOfLetter = availableLetters.indexOf(letter) + 1;
         if(indexOfLetter % 2 == this.number % 2) this.color = 'D';
         else this.color = 'W';
-
-
     }
 }
