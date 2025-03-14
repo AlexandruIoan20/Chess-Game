@@ -191,24 +191,51 @@ public class GameTable extends JPanel implements MouseListener {
             }
     }
 
-    void afis_game_table() {
+    Piece selectPiece(int x, int y) {
+        // Convert the click coordinates into grid indices
+        int col = x / tileSize;
+        int row = y / tileSize;
+
+        if(pieces[row][col] != null) {
+            repaint();
+            pieceSelected = true;
+        }
+
+        return pieces[row][col];
+    }
+
+    void afis_game_table () {
         for(int i = 0; i < 8; i++) {
             for(int j = 0; j < 8; j++) {
                 if(pieces[i][j] != null) System.out.print(pieces[i][j].name);
+                else System.out.print("*");
             }
 
             System.out.println();
         }
     }
 
-    Piece selectPiece(int x, int y) {
-        // Convert the click coordinates into grid indices
-        int col = x / tileSize;
-        int row = y / tileSize;
+    void movePiece (int x, int y) {
+        System.out.println("Functon gets called");
+        // From screen coords to grid indexes
+        int index_i = y / tileSize;
+        int index_j = x / tileSize;
 
-        System.out.println("row, col: " + row + ", col: " + col);
+        if(pieces[index_i][index_j] != null) {
+            return;
+        }
 
-        return pieces[row][col];
+        // Update the indexes
+        pieces[index_i][index_j] = selectedPiece;
+        pieces[selectedPiece.y / tileSize][selectedPiece.x / tileSize] = null;
+
+        selectedPiece.move(index_j * tileSize, index_i * tileSize); // update the objects
+
+        afis_game_table();
+        repaint();
+
+        selectedPiece = null;
+        pieceSelected = false;
     }
 
     @Override
@@ -248,7 +275,6 @@ public class GameTable extends JPanel implements MouseListener {
             g2d.setStroke(new BasicStroke(5));
             g2d.setColor(Color.BLACK);
 
-            System.out.println(selectedPiece.x + " " + selectedPiece.y);
             g2d.drawRect(selectedPiece.x, selectedPiece.y, selectedPiece.width, selectedPiece.height);
         }
     }
@@ -265,15 +291,11 @@ public class GameTable extends JPanel implements MouseListener {
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if(pieceSelected == false) {
-            System.out.println("E: ");
-            System.out.println(e.getX() + " " + e.getY());
+        System.out.println("Pim WOrld");
+        if(!pieceSelected) {
             selectedPiece = selectPiece(e.getX(), e.getY());
-            if(selectedPiece != null) {
-                System.out.println("E: ");
-                System.out.println(selectedPiece.x + " " + selectedPiece.y);
-                repaint();
-            }
+        } else {
+            movePiece(e.getX(), e.getY());
         }
     }
 
