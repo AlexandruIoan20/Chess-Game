@@ -51,9 +51,8 @@ public class GameTable extends JPanel implements MouseListener {
     Piece whiteQueen, darkQueen;
 
     Piece[][] pieces;
-
-    private char[] letters = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
     ArrayList<Block> gameSquares; // ArrayList instead of HashSet
+    ArrayList<Block> availableBlocksToGo;
     Block selectedBlock;
 
     GameTable() {
@@ -73,6 +72,7 @@ public class GameTable extends JPanel implements MouseListener {
         whiteRooks = new ArrayList<>();
 
         gameSquares = new ArrayList<>();
+        availableBlocksToGo = new ArrayList<>();
         selectedPiece = null;
 
         // Get pieces images
@@ -102,7 +102,7 @@ public class GameTable extends JPanel implements MouseListener {
 
     void loadMap() {
         // Init King
-        whiteKing = new Piece(PieceNames.KING.getPieceName(), whiteKingImage, 'W', 4 * tileSize, 7 * tileSize, tileSize);
+        whiteKing = new Piece(PieceNames.KING.getPieceName(), whiteKingImage, 'W', 4 * tileSize, 7 * tileSize, this.tileSize);
         darkKing = new Piece(PieceNames.KING.getPieceName(), darkKingImage, 'D', 4 * tileSize, 0, tileSize);
 
         // Init Queens
@@ -193,6 +193,7 @@ public class GameTable extends JPanel implements MouseListener {
     }
 
     Piece selectPiece(int x, int y) {
+        availableBlocksToGo.clear(); // clear places to go from moving the last piece
         // Convert the click coordinates into grid indices
         int col = x / tileSize;
         int row = y / tileSize;
@@ -203,10 +204,6 @@ public class GameTable extends JPanel implements MouseListener {
         }
 
         return pieces[row][col];
-    }
-
-    void verifyAvailableBlocks() {
-
     }
 
     void afis_game_table () {
@@ -241,6 +238,7 @@ public class GameTable extends JPanel implements MouseListener {
 
         selectedPiece = null;
         pieceSelected = false;
+        availableBlocksToGo.clear();
     }
 
     @Override
@@ -282,6 +280,19 @@ public class GameTable extends JPanel implements MouseListener {
 
             g2d.drawRect(selectedPiece.x, selectedPiece.y, selectedPiece.width, selectedPiece.height);
         }
+
+        if(availableBlocksToGo != null) {
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setColor(Color.GREEN);
+            g2d.setStroke(new BasicStroke(8));
+            for(Block block : availableBlocksToGo) {
+                int index_i = block.y / tileSize;
+                int index_j = block.x / tileSize;
+
+                if(pieces[index_i][index_j] == null)
+                    g.drawRect(block.x, block.y, block.size, block.size);
+            }
+        }
     }
 
     @Override
@@ -296,10 +307,12 @@ public class GameTable extends JPanel implements MouseListener {
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        System.out.println("Pim WOrld");
         if(!pieceSelected) {
             selectedPiece = selectPiece(e.getX(), e.getY());
-            if(selectedPiece != null) verifyAvailableBlocks();
+            if(selectedPiece != null) {
+                availableBlocksToGo = selectedPiece.getAvailableBlockToGo();
+                repaint();
+            }
         } else {
             movePiece(e.getX(), e.getY());
         }
