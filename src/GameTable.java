@@ -4,18 +4,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Arrays;
 import java.util.HashSet;
 
 import src.constants.PieceNames;
 import src.constants.PieceNumbers;
 
 public class GameTable extends JPanel implements MouseListener {
-    private int tileSize = 80;
+    private int tileSize = 100;
     private int squaresOnRow = 8;
     private int boardWidth = tileSize * squaresOnRow;
     private int boardHeight = tileSize * squaresOnRow;
     private boolean pieceSelected = false;
+    Piece selectedPiece;
 
     Image darkQueenImage;
     Image whiteQueenImage;
@@ -50,14 +50,15 @@ public class GameTable extends JPanel implements MouseListener {
     Piece whiteKing, darkKing;
     Piece whiteQueen, darkQueen;
 
-    HashSet<HashSet<Piece>> whitePieces;
-    HashSet<HashSet<Piece>> darkPieces;
+    Piece [][] pieces;
 
     private char[] letters = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
     HashSet<Block> gameSquares;
     Block selectedBlock;
 
     GameTable() {
+        // Init objects
+        pieces = new Piece[8][8];
         addMouseListener(this);
         selectedBlock = null;
         // Init HashSets
@@ -71,22 +72,9 @@ public class GameTable extends JPanel implements MouseListener {
         whiteRooks = new HashSet<>();
 
         gameSquares = new HashSet<>();
-        whitePieces = new HashSet<>();
-        darkPieces = new HashSet<>();
+        selectedPiece = null;
 
-        // Build pieces hash sets
-        whitePieces.add(whiteRooks);
-        whitePieces.add(whiteBishops);
-        whitePieces.add(whiteKnights);
-        whitePieces.add(whitePawns);
-        whitePieces.add(new HashSet<Piece>(Arrays.asList(whiteQueen, whiteKing)));
-
-        darkPieces.add(darkRooks);
-        darkPieces.add(darkBishops);
-        darkPieces.add(darkKnights);
-        darkPieces.add(darkPawns);
-        darkPieces.add(new HashSet<Piece>(Arrays.asList(darkQueen, darkQueen)));
-
+        // Get pieces images
         darkQueenImage = new ImageIcon(getClass().getResource("./resources/black-queen.png")).getImage();
         whiteQueenImage = new ImageIcon(getClass().getResource("./resources/white-queen.png")).getImage();
 
@@ -139,8 +127,56 @@ public class GameTable extends JPanel implements MouseListener {
 
         for(int i = 0; i < PieceNumbers.PAWN_NUMBERS.getPieceNumbers(); i++) {
             whitePawns.add(new Piece(PieceNames.PAWN.getPieceName(), whitePawnImage, 'W', i * tileSize, 6 * tileSize, tileSize));
-            darkPawns.add(new Piece(PieceNames.PAWN.getPieceName(), darkRookImage, 'D', i * tileSize, tileSize, tileSize));
+            darkPawns.add(new Piece(PieceNames.PAWN.getPieceName(), darkPawnImage, 'D', i * tileSize, tileSize, tileSize));
         }
+
+        int index = 0;
+        for(Piece pawn : darkPawns) {
+            pieces[1][index] = pawn;
+            index++;
+        }
+
+        index = 0;
+
+        for(Piece pawn : whitePawns) {
+            pieces[6][index] = pawn;
+            index++;
+        }
+
+        for(Piece rook : darkRooks) {
+            if(pieces[0][0] == null) pieces[0][0] = rook;
+            else pieces[0][7] = rook;
+        }
+
+        for(Piece rook : whiteRooks) {
+            if(pieces[7][0] == null) pieces[7][0] = rook;
+            else pieces[7][7] = rook;
+        }
+
+        for(Piece knight : darkKnights) {
+            if(pieces[0][1] == null) pieces[0][1] = knight;
+            else pieces[0][6] = knight;
+        }
+
+        for(Piece knight : whiteKnights) {
+            if(pieces[7][1] == null) pieces[7][1] = knight;
+            else pieces[7][6] = knight;
+        }
+
+        for(Piece bishop : darkBishops) {
+            if(pieces[0][2] == null) pieces[0][2] = bishop;
+            else pieces[0][5] = bishop;
+        }
+
+        for(Piece bishop : whiteBishops) {
+            if(pieces[7][2] == null) pieces[7][2] = bishop;
+            else pieces[7][5] = bishop;
+        }
+
+        pieces[0][3] = darkQueen;
+        pieces[0][4] = darkKing;
+        pieces[7][3] = whiteQueen;
+        pieces[7][4] = whiteKing;
 
         for(int i = 0; i < 8; i++)
             for(int j = 0; j < 8; j++) {
@@ -153,87 +189,25 @@ public class GameTable extends JPanel implements MouseListener {
             }
     }
 
-    void selectBlock(int x, int y) {
-        this.pieceSelected = true;
-        Block newSelectedBlock = findBlockByCoordinates(x, y);
-
-        if(newSelectedBlock != null && newSelectedBlock.isOcupied) {
-            if(this.selectedBlock != null) this.selectedBlock.isSelected = false;
-            this.selectedBlock = newSelectedBlock;
-            this.selectedBlock.isSelected = true;
-        }
-
-        repaint();
-    }
-
-    void movePiece(int x, int y) {
-        pieceSelected = false;
-
-        Piece selectedPiece = findPieceByCoordinates(x, y);
-        Block blockToMove = findBlockByCoordinates(x, y);
-
-        System.out.println(selectedPiece.name);
-        System.out.println(blockToMove.letter + " " + blockToMove.number);
-
-        System.out.println("Done");
-    }
-
-    Block findBlockByCoordinates(int x, int y) {
-        Block newSelectedBlock = null;
-        int minDifX = Integer.MAX_VALUE;
-        int minDifY = Integer.MAX_VALUE;
-
-        for(Block block : gameSquares) {
-            if((x - block.x >= 0 && y - block.y >= 0) && (x - block.x < minDifX || y - block.y < minDifY)) {
-                newSelectedBlock = block;
-                minDifX = x - block.x;
-                minDifY = y - block.y;
+    void afis_game_table() {
+        for(int i = 0; i < 8; i++) {
+            for(int j = 0; j < 8; j++) {
+                if(pieces[i][j] != null) System.out.print(pieces[i][j].name);
             }
-        }
 
-        return newSelectedBlock;
+            System.out.println();
+        }
     }
 
-    Piece findPieceByCoordinates(int x, int y) {
-        int minDifX = Integer.MAX_VALUE;
-        int minDifY = Integer.MAX_VALUE;
+    Piece selectPiece(int x, int y) {
+        // Convert the click coordinates into grid indices
+        int col = x / tileSize;
+        int row = y / tileSize;
 
-        Piece result = null;
+        System.out.println("row, col: " + row + ", col: " + col);
 
-        // Check for null whitePieces and darkPieces before iterating
-        if (whitePieces != null) {
-            for (HashSet<Piece> pieceSet : whitePieces) {
-                if (pieceSet != null) {
-                    for (Piece piece : pieceSet) {
-                        if (piece != null && (x - piece.x >= 0 && y - piece.y >= 0) &&
-                                (x - piece.x < minDifX || y - piece.y < minDifY)) {
-                            result = piece;
-                            minDifX = x - piece.x;
-                            minDifY = y - piece.y;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (darkPieces != null) {
-            for (HashSet<Piece> pieceSet : darkPieces) {
-                if (pieceSet != null) {
-                    for (Piece piece : pieceSet) {
-                        if (piece != null && (x - piece.x >= 0 && y - piece.y >= 0) &&
-                                (x - piece.x < minDifX || y - piece.y < minDifY)) {
-                            result = piece;
-                            minDifX = x - piece.x;
-                            minDifY = y - piece.y;
-                        }
-                    }
-                }
-            }
-        }
-
-        return result;
+        return pieces[row][col];
     }
-
 
     @Override
     public void paintComponent(Graphics g) {
@@ -261,23 +235,20 @@ public class GameTable extends JPanel implements MouseListener {
             }
         }
         // Draw Pieces
-        g.drawImage(whiteKing.image, whiteKing.x, whiteKing.y, whiteKing.width, whiteKing.height, null);
-        g.drawImage(darkKing.image, darkKing.x, darkKing.y, darkKing.width, darkKing.height, null);
+        for(int i = 0; i < 8; i++)
+            for(int j = 0; j < 8; j++)
+                if(pieces[i][j] != null)
+                    g.drawImage(pieces[i][j].image, pieces[i][j].x, pieces[i][j].y, pieces[i][j].width, pieces[i][j].height, null);
 
-        g.drawImage(whiteQueen.image, whiteQueen.x, whiteQueen.y, whiteQueen.width, whiteQueen.height, null);
-        g.drawImage(darkQueen.image, darkQueen.x, darkQueen.y, darkQueen.width, darkQueen.height, null);
+        if(selectedPiece != null) {
+            Graphics2D g2d = (Graphics2D) g;
 
-        for(Piece bishop : whiteBishops) g.drawImage(bishop.image, bishop.x, bishop.y, bishop.width, bishop.height, null);
-        for(Piece bishop : darkBishops) g.drawImage(bishop.image, bishop.x, bishop.y, bishop.width, bishop.height, null);
+            g2d.setStroke(new BasicStroke(5));
+            g2d.setColor(Color.BLACK);
 
-        for(Piece knight : whiteKnights) g.drawImage(knight.image, knight.x, knight.y, knight.width, knight.height, null);
-        for(Piece knight : darkKnights) g.drawImage(knight.image, knight.x, knight.y, knight.width, knight.height, null);
-
-        for(Piece rook : whiteRooks) g.drawImage(rook.image, rook.x, rook.y, rook.width, rook.height, null);
-        for(Piece rook : darkRooks) g.drawImage(rook.image, rook.x, rook.y, rook.width, rook.height, null);
-
-        for(Piece pawn : whitePawns) g.drawImage(pawn.image, pawn.x, pawn.y, pawn.width, pawn.height, null);
-        for(Piece pawn : darkPawns) g.drawImage(pawn.image, pawn.x, pawn.y, pawn.width, pawn.height, null);
+            System.out.println(selectedPiece.x + " " + selectedPiece.y);
+            g2d.drawRect(selectedPiece.x, selectedPiece.y, selectedPiece.width, selectedPiece.height);
+        }
     }
 
     @Override
@@ -292,8 +263,16 @@ public class GameTable extends JPanel implements MouseListener {
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if(!this.pieceSelected) selectBlock(e.getX(), e.getY());
-        else movePiece(e.getX(), e.getY());
+        if(pieceSelected == false) {
+            System.out.println("E: ");
+            System.out.println(e.getX() + " " + e.getY());
+            selectedPiece = selectPiece(e.getX(), e.getY());
+            if(selectedPiece != null) {
+                System.out.println("E: ");
+                System.out.println(selectedPiece.x + " " + selectedPiece.y);
+                repaint();
+            }
+        }
     }
 
     @Override

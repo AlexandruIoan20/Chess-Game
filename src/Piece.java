@@ -26,6 +26,10 @@ public class Piece {
         this.startY = y;
     }
 
+    public boolean contains(int clickX, int clickY) {
+        return clickX >= x && clickX <= (x + width) && clickY >= y && clickY <= (y + height);
+    }
+
     public Block[] checkMove(Block existingBlock) {
         // scrie functia de verificare miscare pentru fiecare piesa
             // primeste blockul unde se afla si trebuie sa returneze toate blocurile unde poate ajunge (sau ceva de genu)
