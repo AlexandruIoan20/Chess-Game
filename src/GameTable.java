@@ -4,13 +4,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.HashSet;
-
+import java.util.ArrayList;
 import src.constants.PieceNames;
 import src.constants.PieceNumbers;
 
 public class GameTable extends JPanel implements MouseListener {
-    private int tileSize = 100;
+    private int tileSize = 80;
     private int squaresOnRow = 8;
     private int boardWidth = tileSize * squaresOnRow;
     private int boardHeight = tileSize * squaresOnRow;
@@ -35,25 +34,26 @@ public class GameTable extends JPanel implements MouseListener {
     Image darkPawnImage;
     Image whitePawnImage;
 
-    HashSet<Piece> darkPawns;
-    HashSet<Piece> whitePawns;
+    // ArrayLists for storing pieces
+    ArrayList<Piece> darkPawns;
+    ArrayList<Piece> whitePawns;
 
-    HashSet<Piece> darkKnights;
-    HashSet<Piece> whiteKnights;
+    ArrayList<Piece> darkKnights;
+    ArrayList<Piece> whiteKnights;
 
-    HashSet<Piece> darkBishops;
-    HashSet<Piece> whiteBishops;
+    ArrayList<Piece> darkBishops;
+    ArrayList<Piece> whiteBishops;
 
-    HashSet<Piece> darkRooks;
-    HashSet<Piece> whiteRooks;
+    ArrayList<Piece> darkRooks;
+    ArrayList<Piece> whiteRooks;
 
     Piece whiteKing, darkKing;
     Piece whiteQueen, darkQueen;
 
-    Piece [][] pieces;
+    Piece[][] pieces;
 
     private char[] letters = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
-    HashSet<Block> gameSquares;
+    ArrayList<Block> gameSquares; // ArrayList instead of HashSet
     Block selectedBlock;
 
     GameTable() {
@@ -61,17 +61,18 @@ public class GameTable extends JPanel implements MouseListener {
         pieces = new Piece[8][8];
         addMouseListener(this);
         selectedBlock = null;
-        // Init HashSets
-        darkPawns = new HashSet<>();
-        whitePawns = new HashSet<>();
-        darkKnights = new HashSet<>();
-        whiteKnights = new HashSet<>();
-        darkBishops = new HashSet<>();
-        whiteBishops = new HashSet<>();
-        darkRooks = new HashSet<>();
-        whiteRooks = new HashSet<>();
 
-        gameSquares = new HashSet<>();
+        // Init ArrayLists
+        darkPawns = new ArrayList<>();
+        whitePawns = new ArrayList<>();
+        darkKnights = new ArrayList<>();
+        whiteKnights = new ArrayList<>();
+        darkBishops = new ArrayList<>();
+        whiteBishops = new ArrayList<>();
+        darkRooks = new ArrayList<>();
+        whiteRooks = new ArrayList<>();
+
+        gameSquares = new ArrayList<>();
         selectedPiece = null;
 
         // Get pieces images
@@ -97,6 +98,7 @@ public class GameTable extends JPanel implements MouseListener {
         this.setBackground(Color.CYAN);
         loadMap();
     }
+
 
     void loadMap() {
         // Init King
