@@ -27,10 +27,7 @@ public class Piece {
     }
 
     public Block[] checkMove(Block existingBlock) {
-        // scrie functia de verificare miscare pentru fiecare piesa
-            // primeste blockul unde se afla si trebuie sa returneze toate blocurile unde poate ajunge (sau ceva de genu)
-
-        return new Block [] { new Block('a', 1, 2, 3, 4) };
+        return null;
     }
 
     public void move(int x, int y) {

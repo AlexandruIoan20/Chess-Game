@@ -182,12 +182,13 @@ public class GameTable extends JPanel implements MouseListener {
 
         for(int i = 0; i < 8; i++)
             for(int j = 0; j < 8; j++) {
-                Block block = new Block(letters[j], 8 - i, j * tileSize, i * tileSize, tileSize);
+                Block block = new Block(j * tileSize, i * tileSize, tileSize);
 
                 if(8 - i == 8 || 8 - i == 7 || 8 - i == 2 || 8  - i == 1) block.isOcupied = true;
                 else block.isOcupied = false;
 
                 gameSquares.add(block);
+                System.out.println(block);
             }
     }
 
@@ -202,6 +203,10 @@ public class GameTable extends JPanel implements MouseListener {
         }
 
         return pieces[row][col];
+    }
+
+    void verifyAvailableBlocks() {
+
     }
 
     void afis_game_table () {
@@ -294,6 +299,7 @@ public class GameTable extends JPanel implements MouseListener {
         System.out.println("Pim WOrld");
         if(!pieceSelected) {
             selectedPiece = selectPiece(e.getX(), e.getY());
+            if(selectedPiece != null) verifyAvailableBlocks();
         } else {
             movePiece(e.getX(), e.getY());
         }
